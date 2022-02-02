@@ -166,6 +166,8 @@ def main():
 
     history_score = np.zeros((args.epochs + 1, 1))
     np.savetxt(os.path.join(args.save, 'record.txt'), history_score, fmt = '%10.5f', delimiter=',')
+
+    #start training
     for epoch in range(args.start_epoch, args.epochs):
         if args.distributed:
             train_sampler.set_epoch(epoch)
@@ -193,6 +195,9 @@ def main():
     history_score[-1] = best_prec1.cpu()
     np.savetxt(os.path.join(args.save, 'record.txt'), history_score, fmt = '%10.5f', delimiter=',')
 
+"""
+trains the model for one epoch 
+"""
 def train(train_loader, model, criterion, optimizer, epoch):
     batch_time = AverageMeter()
     data_time = AverageMeter()
@@ -243,6 +248,10 @@ def train(train_loader, model, criterion, optimizer, epoch):
         if i == args.train_batchsize:
             break
 
+"""
+computes the accuracy of the model over the validation dataset
+and returns the top1 accuracy
+"""
 def validate(val_loader, model, criterion):
     batch_time = AverageMeter()
     losses = AverageMeter()

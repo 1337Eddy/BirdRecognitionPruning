@@ -139,6 +139,7 @@ skip = {
     'B': [2, 8, 14, 16, 26, 28, 30, 32],
 }
 
+#pruning ratios for layer stages
 prune_prob = {
     'A': [0.5, 0.7, 0.6, 0.5],
     'B': [0.5, 0.6, 0.4, 0.0],
@@ -163,7 +164,9 @@ for m in model.modules():
             cfg.append(out_channels)
             layer_id += 1
             continue
+       
         if layer_id % 2 == 0:
+            #define layer stage for pruning ratio
             if layer_id <= 6:
                 stage = 0
             elif layer_id <= 14:
@@ -174,6 +177,8 @@ for m in model.modules():
                 stage = 3
             prune_prob_stage = prune_prob[args.v][stage]
             weight_copy = m.weight.data.abs().clone().cpu().numpy()
+
+            #sum weights of 3d filter 
             L1_norm = np.sum(weight_copy, axis=(1,2,3))
             num_keep = int(out_channels * (1 - prune_prob[args.v][stage]))
             arg_max = np.argsort(L1_norm)
